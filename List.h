@@ -18,6 +18,8 @@ List_##ALIAS##_push(struct List_##ALIAS **node, _List_##ALIAS##_T val);   \
 _List_##ALIAS##_T*                                                        \
 List_##ALIAS##_insert(struct List_##ALIAS **node, _List_##ALIAS##_T val); \
 _List_##ALIAS##_T List_##ALIAS##_pop(struct List_##ALIAS **node);         \
+void List_##ALIAS##_append(struct List_##ALIAS **a,                       \
+                                        struct List_##ALIAS *b);          \
 size_t List_##ALIAS##_length(struct List_##ALIAS ** const node);
 
 #define LIST_IMPL(ALIAS)                                                 \
@@ -38,19 +40,25 @@ _List_##ALIAS##_T*                                                       \
 List_##ALIAS##_push(struct List_##ALIAS **node, _List_##ALIAS##_T val)   \
 {                                                                        \
         struct List_##ALIAS* res = malloc(sizeof(struct List_##ALIAS));  \
-        if(!res) return NULL;                                                 \
+        if(!res) return NULL;                                                \
         *res = (struct List_##ALIAS){val, *node};                        \
         *node = res;                                                     \
         return &res->val;                                                     \
+}                                                                        \
+void List_##ALIAS##_append(struct List_##ALIAS **a,                      \
+                           struct List_##ALIAS *b)                       \
+{                                                                        \
+        struct List_##ALIAS **ptr = a;                                   \
+        while(*ptr) ptr = &(*ptr)->next;                                 \
+        *ptr = b;                                                        \
 }                                                                        \
 _List_##ALIAS##_T*                                                       \
 List_##ALIAS##_insert(struct List_##ALIAS **node, _List_##ALIAS##_T val) \
 {                                                                        \
         struct List_##ALIAS* res = malloc(sizeof(struct List_##ALIAS));  \
-        if(!res) return NULL;                                                 \
-        while(*node) node = &(*node)->next;                              \
+        if(!res) return NULL;                                                \
         *res = (struct List_##ALIAS){val, NULL};                         \
-        *node = res;                                                     \
+        List_##ALIAS##_append(node, res);                                \
         return &res->val;                                                     \
 }                                                                        \
 _List_##ALIAS##_T                                                        \
